@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Cart Dashboard</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f5f5f5;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        h2 {
+            margin-bottom: 15px;
+        }
+        
+        .card {
+            background: white;
+            padding: 17px 10px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        img {
+            width: 100px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+        
+        button {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 3px;
+        }
+        
+        .plus {
+            background: green;
+            color: white;
+        }
+        
+        .minus {
+            background: orange;
+            color: white;
+        }
+        
+        .remove {
+            background: red;
+            color: white;
+        }
+        
+        .risebo {
+            background: #6a0dad;
+            color: white;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .backBtn {
+            background: #333;
+            color: white;
+        }
+        
+        @media(max-width:600px) {
+            body {
+                padding: 10px;
+            }
+            .risebo {
+                width: calc(100% - 20px);
+                left: 10px;
+                right: 10px;
+                bottom: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>🛒 Cart Dashboard</h2>
+
+    <div class="card">
+        <b>Name:</b> <span id="name"></span><br><br>
+        <b>Address:</b> <span id="address"></span><br><br>
+        <b>Phone:</b> <span id="number"></span>
+    </div>
+
+    <div id="cart"></div>
+
+    <div class="card">
+        <h2>Total: ₱<span id="total">0</span></h2>
+
+        <!-- 🔥 RISEBO BUTTON -->
+        <button class="risebo" onclick="goRisebo()">
+            🚀 Risebo
+        </button>
+
+        <button class="backBtn" onclick="goShop()">
+            ⬅ Back Shop
+        </button>
+    </div>
+
+    <script>
+        let products = JSON.parse(localStorage.getItem("products")) || [];
+        let cart = JSON.parse(localStorage.getItem("cart")) || [];
+        let qty = JSON.parse(localStorage.getItem("qty")) || [];
+
+        document.getElementById("name").innerText = localStorage.getItem("name") || "";
+        document.getElementById("address").innerText = localStorage.getItem("address") || "";
+        document.getElementById("number").innerText = localStorage.getItem("phone") || "";
+
+        function render() {
+            let html = "";
+            let total = 0;
+
+            products.forEach((p, i) => {
+                if (cart[i]) {
+
+                    if (!qty[i] || qty[i] < 1) qty[i] = 1;
+
+                    let subtotal = Number(p.price) * Number(qty[i]);
+                    total += subtotal;
+
+                    html += `
+                <div class="card">
+                    <img src="${p.img}">
+                    <h3>${p.name}</h3>
+                    <p>Price: ₱${p.price}</p>
+
+                    <button class="minus" onclick="minus(${i})">-</button>
+                    <b>${qty[i]}</b>
+                    <button class="plus" onclick="plus(${i})">+</button>
+
+                    <h3>Subtotal: ₱${subtotal}</h3>
+
+                    <button class="remove" onclick="removeItem(${i})">
+                        Remove
+                    </button>
+                </div>
+            `;
+                }
+            });
+
+            if (html === "") {
+                html = `<div class="card"><h3>🛒 Cart is empty</h3></div>`;
+            }
+
+            document.getElementById("cart").innerHTML = html;
+            document.getElementById("total").innerText = total;
+        }
+
+        function plus(i) {
+            qty[i]++;
+            save();
+        }
+
+        function minus(i) {
+            if (qty[i] > 1) {
+                qty[i]--;
+                save();
+            }
+        }
+
+        function removeItem(i) {
+            cart[i] = false;
+            qty[i] = 0;
+            save();
+        }
+
+        function save() {
+            localStorage.setItem("cart", JSON.stringify(cart));
+            localStorage.setItem("qty", JSON.stringify(qty));
+            render();
+        }
+
+        function goShop() {
+            window.location.href = "shop1.html";
+        }
+
+        // 🔥 NEW PAGE REDIRECT
+        function goRisebo() {
+            window.location.href = "risebo.html";
+        }
+
+        render();
+    </script>
+
+</body>
+
+</html>
